@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.ArrayList;
 import java.util.List;
 @RestController
+@RequestMapping("/api/v1/todo")
 public class TodoController {
 
     private static List<Todo> todoList;
@@ -19,13 +20,13 @@ public class TodoController {
         todoList.add(new Todo(4 , false , "OS" , 4));
     }
 
-    @GetMapping("/todo")
+    @GetMapping
 
     public ResponseEntity<List<Todo>> getTodo(){
         return ResponseEntity.ofNullable(todoList);
     }
 
-    @PostMapping("/todo")
+    @PostMapping
     /**
      * we can use this annotation set the status code  @ResponseStatus(HttpStatus.CREATED)
      *
@@ -34,6 +35,18 @@ public class TodoController {
     public ResponseEntity<Todo> createTodo(@RequestBody Todo newTodo){
         todoList.add(newTodo);
         return ResponseEntity.status(HttpStatus.CREATED).body(newTodo);
+    }
+
+    @GetMapping("/todo/{todoId}")
+
+    public ResponseEntity<Todo> getTodoById(@PathVariable Long todoId){
+
+        for (Todo todo : todoList){
+            if (todo.getId() == todoId){
+                return ResponseEntity.ok(todo);
+            }
+        }
+        return ResponseEntity.notFound().build();
     }
 
 }
