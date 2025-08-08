@@ -5,9 +5,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 @RestController
-@RequestMapping("/api/v1/todo")
+@RequestMapping("/api/v1/todos")
 public class TodoController {
 
     private static List<Todo> todoList;
@@ -39,14 +40,35 @@ public class TodoController {
 
     @GetMapping("/todo/{todoId}")
 
-    public ResponseEntity<Todo> getTodoById(@PathVariable Long todoId){
+    public ResponseEntity<Object> getTodoById(@PathVariable Long todoId){
 
         for (Todo todo : todoList){
             if (todo.getId() == todoId){
                 return ResponseEntity.ok(todo);
             }
         }
-        return ResponseEntity.notFound().build();
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Todo with Id" + todoId + "Not Found!");
     }
 
+
+    /// Delete Request
+
+    @DeleteMapping("/todo/{todoId}")
+
+    public ResponseEntity<Object> deleteRequest(@PathVariable Long todoId){
+
+        Iterator<Todo> iterator = todoList.iterator();
+
+        while (iterator.hasNext()){
+            Todo todo = iterator.next();
+
+            if (todo.getId() == (todoId)){
+                iterator.remove();
+                return ResponseEntity.ok("Todo With Id " + todoId + "Succefully Deleted");
+            }
+        }
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).
+                body(new ApiResponce("error", "Todo with id " + todoId + "Not found"));
+
+    }
 }
