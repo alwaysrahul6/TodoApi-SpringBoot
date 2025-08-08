@@ -1,5 +1,7 @@
 package TodoApi.TodoApi;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -12,6 +14,9 @@ import java.util.List;
 public class TodoController {
 
     private static List<Todo> todoList;
+    @Autowired
+    @Qualifier("FakeTodo")
+    TodoService todoService;
 
     TodoController(){
         todoList = new ArrayList<>();
@@ -23,10 +28,11 @@ public class TodoController {
 
     @GetMapping
 
-    public ResponseEntity<List<Todo>> getTodo(){
-        return ResponseEntity.ofNullable(todoList);
-    }
+    public ResponseEntity<List<Todo>> getTodo(@RequestParam(required = false) boolean isCompleted){
+        System.out.println("Incoming QueryParam : " + isCompleted + " "+ todoService.doSomething());
 
+        return ResponseEntity.ok(todoList);
+    }
     @PostMapping
     /**
      * we can use this annotation set the status code  @ResponseStatus(HttpStatus.CREATED)
@@ -35,6 +41,7 @@ public class TodoController {
 
     public ResponseEntity<Todo> createTodo(@RequestBody Todo newTodo){
         todoList.add(newTodo);
+
         return ResponseEntity.status(HttpStatus.CREATED).body(newTodo);
     }
 
@@ -64,11 +71,11 @@ public class TodoController {
 
             if (todo.getId() == (todoId)){
                 iterator.remove();
-                return ResponseEntity.ok("Todo With Id " + todoId + "Succefully Deleted");
+                return ResponseEntity.ok("Todo With Id " + todoId + " Succefully Deleted");
             }
         }
         return ResponseEntity.status(HttpStatus.NOT_FOUND).
-                body(new ApiResponce("error", "Todo with id " + todoId + "Not found"));
-
+                body(new ApiResponce("error", "Todo with id " + todoId + " Not found"));
     }
+
 }
